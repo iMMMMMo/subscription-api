@@ -12,5 +12,3 @@ class Plan(Base):
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     request_limit: Mapped[int] = mapped_column(Integer, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-
-    users: Mapped[list["User"]] = relationship(back_populates="plan", lazy="selectin")

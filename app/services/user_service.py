@@ -2,7 +2,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
-from app.models.plan import Plan
 from app.core.security import hash_password, verify_password
 
 
@@ -31,16 +30,10 @@ async def create_user(
     password: str,
     full_name: str | None,
 ) -> User:
-    result = await session.execute(
-        select(Plan).where(Plan.name == "FREE", Plan.is_active == True)
-    )
-    plan = result.scalar_one()
-
     user = User(
         email=email,
         full_name=full_name,
         hashed_password=hash_password(password),
-        plan_id=plan.id,
     )
 
     session.add(user)

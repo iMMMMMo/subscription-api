@@ -21,7 +21,3 @@ class User(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-
-    plan_id: Mapped[int] = mapped_column(ForeignKey("plans.id"), nullable=False)
-    plan: Mapped["Plan"] = relationship(back_populates="users", lazy="selectin")
-
