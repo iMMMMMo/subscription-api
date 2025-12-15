@@ -1,6 +1,6 @@
 from fastapi import FastAPI
+from app.api.v1 import auth_router, api_keys_router
 
-from app.api.v1 import auth_router
 
 app = FastAPI(
     title="Subscription API",
@@ -8,6 +8,8 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(api_keys_router)
+
 
 @app.get("/", tags=["root"])
 async def root() -> dict:
