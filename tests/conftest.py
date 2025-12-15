@@ -1,0 +1,62 @@
+import os
+import tempfile
+
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
+
+from app.main import app
+from app.db.session import get_session
+from app.models.plan import Plan
+
+
+@pytest_asyncio.fixture(name="session")
+async def session_fixture() -> AsyncSession:
+    """Creates a clean SQLite database for each test (async)."""
+    db_fd, db_path = tempfile.mkstemp(suffix=".db")
+    os.close(db_fd)
+
+    engine = create_async_engine(
+        f"sqlite+aiosqlite:///{db_path}",
+        connect_args={"check_same_thread": False},
+        poolclass=NullPool,
+    )
+
+    # Import models before create_all so metadata contains tables
+    from app.db.base import Base
+    from app import models 
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    SessionLocal = async_sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+
+    async with SessionLocal() as session:
+        # Minimal seed needed by create_user() default FREE plan
+        session.add(Plan(name="FREE", request_limit=0, is_active=True))
+        await session.commit()
+        yield session
+
+    await engine.dispose()
+    os.remove(db_path)
+
+
+@pytest_asyncio.fixture()
+async def client(session: AsyncSession) -> AsyncClient:
+    """Override dependency get_session so app uses the test DB."""
+
+    async def override_get_session():
+        yield session
+
+    app.dependency_overrides[get_session] = override_get_session
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+
+    app.dependency_overrides.clear()
