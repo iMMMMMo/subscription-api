@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1 import auth_router, api_keys_router
+from app.api.v1 import auth_router, api_keys_router, data_router
 
 
 app = FastAPI(
@@ -9,6 +9,7 @@ app = FastAPI(
 
 app.include_router(auth_router)
 app.include_router(api_keys_router)
+app.include_router(data_router)
 
 
 @app.get("/", tags=["root"])
