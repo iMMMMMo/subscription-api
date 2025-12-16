@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, ForeignKey
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -19,6 +19,14 @@ class Subscription(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
+    )
+
+    __table_args__ = (
+        Index(
+            "ix_subscriptions_user_active",
+            "user_id",
+            postgresql_where=text("is_active = true"),
+        ),
     )
 
     user: Mapped["User"] = relationship(lazy="selectin")
