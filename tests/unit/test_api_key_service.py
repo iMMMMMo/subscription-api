@@ -3,15 +3,22 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from app.models.api_key import APIKey
+from app.models.subscription import Subscription
 from app.services.api_key_service import create_api_key, list_api_keys, revoke_api_key
 
 
 @pytest.mark.asyncio
 async def test_create_api_key_adds_and_persists_key():
     session = MagicMock()
+    session.execute = AsyncMock()
     session.add = MagicMock()
     session.commit = AsyncMock()
     session.refresh = AsyncMock()
+
+    existing_subscription = Subscription(user_id=42, plan_id=1)
+    result = MagicMock()
+    result.scalar_one_or_none.return_value = existing_subscription
+    session.execute.return_value = result
 
     async def _refresh(obj: APIKey):
         obj.id = 123

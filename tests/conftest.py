@@ -44,8 +44,7 @@ async def session_fixture() -> AsyncSession:
     )
 
     async with SessionLocal() as session:
-        # Minimal seed needed by create_user() default FREE plan
-        session.add(Plan(name="FREE", request_limit=0, is_active=True))
+        session.add(Plan(name="FREE", request_limit=2, is_active=True))
         await session.commit()
         yield session
 
