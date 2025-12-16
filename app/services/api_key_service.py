@@ -2,13 +2,18 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.api_key import APIKey
-
+from app.services.subscription_service import ensure_active_subscription
 
 async def create_api_key(
     session: AsyncSession,
     *,
     user_id: int,
 ) -> APIKey:
+    await ensure_active_subscription(
+        session,
+        user_id=user_id,
+    )
+    
     api_key = APIKey(user_id=user_id)
     session.add(api_key)
     await session.commit()
