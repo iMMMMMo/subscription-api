@@ -1,17 +1,15 @@
-from datetime import date
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.usage import Usage
-
+from app.core.time import utc_today
 
 async def increment_usage(
     session: AsyncSession,
     *,
     api_key_id: int,
 ) -> int:
-    today = date.today()
+    today = utc_today()
 
     result = await session.execute(
         select(Usage).where(
