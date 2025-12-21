@@ -1,11 +1,32 @@
+import asyncio
+from contextlib import asynccontextmanager, suppress
+
 from fastapi import FastAPI
+
 from app.api.v1 import auth_router, api_keys_router, data_router
+from app.tasks.usage_cleanup import start_usage_cleanup_loop
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    usage_cleanup_task = asyncio.create_task(
+        start_usage_cleanup_loop(),
+        name="usage-cleanup-loop",
+    )
+    try:
+        yield
+    finally:
+        usage_cleanup_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await usage_cleanup_task
 
 
 app = FastAPI(
-    title="Subscription API",
-    version="0.1.0",
+    title="Subscription API", 
+    version="0.1.0", 
+    lifespan=lifespan
 )
+
 
 app.include_router(auth_router)
 app.include_router(api_keys_router)
