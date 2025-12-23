@@ -3,7 +3,12 @@ from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 
-from app.api.v1 import auth_router, api_keys_router, data_router
+from app.api.v1 import (
+    auth_router, 
+    api_keys_router, 
+    data_router, 
+    admin_plans_router,
+)
 from app.tasks.usage_cleanup import start_usage_cleanup_loop
 
 
@@ -31,6 +36,7 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(api_keys_router)
 app.include_router(data_router)
+app.include_router(admin_plans_router)
 
 
 @app.get("/", tags=["root"])
