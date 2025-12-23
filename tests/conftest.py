@@ -1,10 +1,15 @@
 import os
 import tempfile
+from collections.abc import AsyncIterator
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import event
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncSession, 
+    async_sessionmaker, 
+    create_async_engine,
+)
 from sqlalchemy.pool import NullPool
 
 from app.main import app
@@ -13,7 +18,7 @@ from app.models.plan import Plan
 
 
 @pytest_asyncio.fixture(name="session")
-async def session_fixture() -> AsyncSession:
+async def session_fixture() -> AsyncIterator[AsyncSession]:
     """Creates a clean SQLite database for each test (async)."""
     db_fd, db_path = tempfile.mkstemp(suffix=".db")
     os.close(db_fd)
@@ -53,7 +58,7 @@ async def session_fixture() -> AsyncSession:
 
 
 @pytest_asyncio.fixture()
-async def client(session: AsyncSession) -> AsyncClient:
+async def client(session: AsyncSession) -> AsyncIterator[AsyncClient]:
     """Override dependency get_session so app uses the test DB."""
 
     async def override_get_session():

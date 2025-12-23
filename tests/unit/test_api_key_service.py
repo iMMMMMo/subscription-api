@@ -4,7 +4,11 @@ import pytest
 
 from app.models.api_key import APIKey
 from app.models.subscription import Subscription
-from app.services.api_key_service import create_api_key, list_api_keys, revoke_api_key
+from app.services.api_key_service import (
+    create_api_key, 
+    list_api_keys, 
+    revoke_api_key,
+)
 
 
 @pytest.mark.asyncio
