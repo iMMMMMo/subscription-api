@@ -4,6 +4,10 @@ from app.core.security import get_current_subject
 from app.db.session import get_session
 from app.services.user_service import get_user_by_id
 
+import logging
+
+
+logger =  logging.getLogger("admin.access")
 
 async def require_superuser(
     subject: str = Depends(get_current_subject),
@@ -19,6 +23,10 @@ async def require_superuser(
 
     user = await get_user_by_id(session, user_id)
     if not user or not user.is_superuser:
+        logger.warning(
+            "admin_access_denied",
+            extra={"user_id": user_id},
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privileges required",

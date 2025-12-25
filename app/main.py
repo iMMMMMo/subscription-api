@@ -10,7 +10,9 @@ from app.api.v1 import (
     admin_plans_router,
 )
 from app.tasks.usage_cleanup import start_usage_cleanup_loop
+from app.core.logging import setup_logging
 
+setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

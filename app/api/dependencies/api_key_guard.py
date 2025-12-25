@@ -8,6 +8,11 @@ from app.models.plan import Plan
 from app.services.subscription_service import get_active_plan_for_user
 from app.services.usage_service import increment_usage
 
+import logging
+
+
+logger =  logging.getLogger("api.access")
+
 
 async def _get_api_key(
     *,
@@ -15,6 +20,10 @@ async def _get_api_key(
     raw_key: str | None,
 ) -> APIKey:
     if not raw_key:
+        logger.warning(
+            "api_key_missing",
+            extra={"path": "api_key_guard"},
+        )   
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key missing")
 
     result = await session.execute(
@@ -26,6 +35,13 @@ async def _get_api_key(
     api_key = result.scalar_one_or_none()
 
     if not api_key:
+        logger.warning(
+            "api_key_invalid",
+            extra={
+                "key_prefix": raw_key[:4],
+                "path": "api_key_guard",
+            },
+        )
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
 
     return api_key
@@ -60,6 +76,14 @@ async def _enforce_usage_limit(
     )
 
     if usage_count > request_limit:
+        logger.info(
+            "rate_limit_exceeded",
+            extra={
+                "api_key_id": api_key_id,
+                "usage": usage_count,
+                "limit": request_limit,
+            },
+        )
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Request limit exceeded",
