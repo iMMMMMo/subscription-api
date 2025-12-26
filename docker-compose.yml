@@ -5,7 +5,8 @@ services:
       dockerfile: docker/Dockerfile
     container_name: subscription-api
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env.docker
     ports:
@@ -19,10 +20,11 @@ services:
     container_name: subscription-db
     env_file:
       - .env.docker
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     ports:
       - "5432:5432"
     volumes:
