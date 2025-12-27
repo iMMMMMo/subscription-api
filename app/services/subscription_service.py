@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.subscription import Subscription
@@ -52,6 +53,18 @@ async def ensure_active_subscription(
         plan_id=plan.id,
     )
     session.add(subscription)
-    await session.commit()
-    await session.refresh(subscription)
-    return subscription
+    try:
+        await session.commit()
+        await session.refresh(subscription)
+        return subscription
+    except IntegrityError:
+        await session.rollback()
+
+        result = await session.execute(
+            select(Subscription).where(
+                Subscription.user_id == user_id,
+                Subscription.is_active == True,
+            )
+        )
+        existing = result.scalar_one()
+        return existing
