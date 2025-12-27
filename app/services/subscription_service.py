@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.subscription import Subscription
 from app.models.plan import Plan
+from app.core.config import settings
 
 
 async def get_active_plan_for_user(
@@ -40,7 +41,7 @@ async def ensure_active_subscription(
 
     result = await session.execute(
         select(Plan).where(
-            Plan.name == "FREE",
+            Plan.name == settings.default_plan_name,
             Plan.is_active == True,
         )
     )
