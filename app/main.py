@@ -35,10 +35,10 @@ app = FastAPI(
 )
 
 
-app.include_router(auth_router)
-app.include_router(api_keys_router)
-app.include_router(data_router)
-app.include_router(admin_plans_router)
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(api_keys_router, prefix="/api/v1")
+app.include_router(data_router, prefix="/api/v1")
+app.include_router(admin_plans_router, prefix="/api/v1")
 
 
 @app.get("/", tags=["root"])

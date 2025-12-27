@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from app.api.dependencies.api_key_guard import api_key_guard
 from app.models.api_key import APIKey
 
-router = APIRouter(prefix="/api/v1", tags=["data"])
+router = APIRouter(tags=["data"])
 
 
 @router.get("/data")

@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 async def _register(client: AsyncClient, *, email: str, password: str = "pass123"):
     return await client.post(
-        "/auth/register",
+            "/api/v1/auth/register",
         json={
             "email": email,
             "password": password,
@@ -15,7 +15,7 @@ async def _register(client: AsyncClient, *, email: str, password: str = "pass123
 
 async def _login(client: AsyncClient, *, email: str, password: str = "pass123"):
     return await client.post(
-        "/auth/login",
+            "/api/v1/auth/login",
         json={
             "email": email,
             "password": password,
@@ -73,7 +73,7 @@ async def test_login_wrong_password_returns_401(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_me_requires_bearer_token(client: AsyncClient):
-    resp = await client.get("/auth/me")
+    resp = await client.get("/api/v1/auth/me")
     assert resp.status_code == 401
 
 
@@ -85,7 +85,7 @@ async def test_me_success(client: AsyncClient):
     tokens = login_resp.json()
 
     resp = await client.get(
-        "/auth/me",
+    "/api/v1/auth/me",
         headers={"Authorization": f"Bearer {tokens['access_token']}"},
     )
     assert resp.status_code == 200
@@ -100,7 +100,7 @@ async def test_refresh_success_returns_new_tokens(client: AsyncClient):
     tokens = login_resp.json()
 
     resp = await client.post(
-        "/auth/refresh",
+    "/api/v1/auth/refresh",
         json={"refresh_token": tokens["refresh_token"]},
     )
     assert resp.status_code == 200
@@ -118,7 +118,7 @@ async def test_refresh_with_access_token_returns_401(client: AsyncClient):
     tokens = login_resp.json()
 
     resp = await client.post(
-        "/auth/refresh",
+    "/api/v1/auth/refresh",
         json={"refresh_token": tokens["access_token"]},
     )
     assert resp.status_code == 401

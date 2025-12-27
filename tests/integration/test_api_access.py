@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 async def _register_and_login(client: AsyncClient) -> dict:
     await client.post(
-        "/auth/register",
+            "/api/v1/auth/register",
         json={
             "email": "api-user@example.com",
             "password": "pass123",
@@ -13,7 +13,7 @@ async def _register_and_login(client: AsyncClient) -> dict:
     )
 
     resp = await client.post(
-        "/auth/login",
+            "/api/v1/auth/login",
         json={
             "email": "api-user@example.com",
             "password": "pass123",
@@ -24,7 +24,7 @@ async def _register_and_login(client: AsyncClient) -> dict:
 
 async def _create_api_key(client: AsyncClient, access_token: str) -> str:
     resp = await client.post(
-        "/api-keys",
+           "/api/v1/api-keys",
         headers={"Authorization": f"Bearer {access_token}"},
     )
     return resp.json()["key"]

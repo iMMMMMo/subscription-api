@@ -12,7 +12,7 @@ def _auth_headers(access_token: str) -> dict[str, str]:
 
 async def _register_and_login(client: AsyncClient) -> dict:
     await client.post(
-        "/auth/register",
+        "/api/v1/auth/register",
         json={
             "email": "api-user@example.com",
             "password": "pass123",
@@ -21,7 +21,7 @@ async def _register_and_login(client: AsyncClient) -> dict:
     )
 
     resp = await client.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         json={
             "email": "api-user@example.com",
             "password": "pass123",
@@ -40,7 +40,7 @@ async def _promote_to_superuser(session: AsyncSession, *, email: str) -> None:
 async def _register_and_login_admin(client: AsyncClient, session: AsyncSession) -> dict:
     email = "admin@example.com"
     await client.post(
-        "/auth/register",
+        "/api/v1/auth/register",
         json={
             "email": email,
             "password": "admin-pass",
@@ -51,7 +51,7 @@ async def _register_and_login_admin(client: AsyncClient, session: AsyncSession) 
     await _promote_to_superuser(session, email=email)
 
     resp = await client.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         json={
             "email": email,
             "password": "admin-pass",
@@ -68,7 +68,7 @@ async def _create_plan(
     request_limit: int,
 ) -> Response:
     return await client.post(
-        "/admin/plans",
+        "/api/v1/admin/plans",
         headers=_auth_headers(access_token),
         json={"name": name, "request_limit": request_limit},
     )
@@ -100,7 +100,7 @@ async def test_admin_can_list_all_plans(client: AsyncClient, session: AsyncSessi
     token = tokens["access_token"]
 
     resp = await client.get(
-        "/admin/plans",
+        "/api/v1/admin/plans",
         headers=_auth_headers(token),
     )
     assert resp.status_code == 200
@@ -118,7 +118,7 @@ async def test_admin_can_update_plan(client: AsyncClient, session: AsyncSession)
     plan_id = create.json()["id"]
 
     resp = await client.patch(
-        f"/admin/plans/{plan_id}",
+        f"/api/v1/admin/plans/{plan_id}",
         headers=_auth_headers(token),
         json={"request_limit": 50},
     )
