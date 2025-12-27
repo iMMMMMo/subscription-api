@@ -29,7 +29,7 @@ async def list_plans(
 ) -> list[Plan]:
     stmt = select(Plan)
     if not include_inactive:
-        stmt = stmt.where(Plan.is_active == True)
+        stmt = stmt.where(Plan.is_active.is_(True))
 
     result = await session.execute(stmt)
     return list(result.scalars())
@@ -42,9 +42,7 @@ async def update_plan(
     request_limit: int | None = None,
     is_active: bool | None = None,
 ) -> Plan | None:
-    result = await session.execute(
-        select(Plan).where(Plan.id == plan_id)
-    )
+    result = await session.execute(select(Plan).where(Plan.id == plan_id))
     plan = result.scalar_one_or_none()
     if not plan:
         return None

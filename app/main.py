@@ -4,15 +4,16 @@ from contextlib import asynccontextmanager, suppress
 from fastapi import FastAPI
 
 from app.api.v1 import (
-    auth_router, 
-    api_keys_router, 
-    data_router, 
     admin_plans_router,
+    api_keys_router,
+    auth_router,
+    data_router,
 )
-from app.tasks.usage_cleanup import start_usage_cleanup_loop
 from app.core.logging import setup_logging
+from app.tasks.usage_cleanup import start_usage_cleanup_loop
 
 setup_logging()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,11 +29,7 @@ async def lifespan(app: FastAPI):
             await usage_cleanup_task
 
 
-app = FastAPI(
-    title="Subscription API", 
-    version="0.1.0", 
-    lifespan=lifespan
-)
+app = FastAPI(title="Subscription API", version="0.1.0", lifespan=lifespan)
 
 
 app.include_router(auth_router, prefix="/api/v1")

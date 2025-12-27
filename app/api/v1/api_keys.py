@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import get_current_subject
 from app.db.session import get_session
 from app.schemas.api_key import APIKeyRead
 from app.services.api_key_service import (
@@ -8,7 +9,6 @@ from app.services.api_key_service import (
     list_api_keys,
     revoke_api_key,
 )
-from app.core.security import get_current_subject
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 

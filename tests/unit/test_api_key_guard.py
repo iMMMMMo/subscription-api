@@ -1,12 +1,12 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from fastapi import HTTPException
 
 from app.api.dependencies.api_key_guard import (
-    _get_api_key,
-    _get_active_plan,
     _enforce_usage_limit,
+    _get_active_plan,
+    _get_api_key,
 )
 from app.models.api_key import APIKey
 from app.models.plan import Plan

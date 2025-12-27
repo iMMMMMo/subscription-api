@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.api_key import APIKey
 from app.services.subscription_service import ensure_active_subscription
 
+
 async def create_api_key(
     session: AsyncSession,
     *,
@@ -13,7 +14,7 @@ async def create_api_key(
         session,
         user_id=user_id,
     )
-    
+
     api_key = APIKey(user_id=user_id)
     session.add(api_key)
     await session.commit()
@@ -29,7 +30,7 @@ async def list_api_keys(
     result = await session.execute(
         select(APIKey).where(
             APIKey.user_id == user_id,
-            APIKey.is_active == True,
+            APIKey.is_active.is_(True),
         )
     )
     return list(result.scalars())

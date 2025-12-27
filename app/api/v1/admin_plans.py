@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.admin import require_superuser
 from app.db.session import get_session
-from app.schemas.plan import PlanCreate, PlanUpdate, PlanRead
+from app.schemas.plan import PlanCreate, PlanRead, PlanUpdate
 from app.services.plan_service import (
     create_plan,
     list_plans,
@@ -49,5 +49,7 @@ async def update(
         is_active=data.is_active,
     )
     if not plan:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found"
+        )
     return plan

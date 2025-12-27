@@ -2,9 +2,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.subscription import Subscription
-from app.models.plan import Plan
 from app.core.config import settings
+from app.models.plan import Plan
+from app.models.subscription import Subscription
 
 
 async def get_active_plan_for_user(
@@ -17,8 +17,8 @@ async def get_active_plan_for_user(
         .join(Subscription, Subscription.plan_id == Plan.id)
         .where(
             Subscription.user_id == user_id,
-            Subscription.is_active == True,
-            Plan.is_active == True,
+            Subscription.is_active.is_(True),
+            Plan.is_active.is_(True),
         )
         .limit(1)
     )
@@ -33,7 +33,7 @@ async def ensure_active_subscription(
     result = await session.execute(
         select(Subscription).where(
             Subscription.user_id == user_id,
-            Subscription.is_active == True,
+            Subscription.is_active.is_(True),
         )
     )
     subscription = result.scalar_one_or_none()
@@ -43,7 +43,7 @@ async def ensure_active_subscription(
     result = await session.execute(
         select(Plan).where(
             Plan.name == settings.default_plan_name,
-            Plan.is_active == True,
+            Plan.is_active.is_(True),
         )
     )
     plan = result.scalar_one()
@@ -63,7 +63,7 @@ async def ensure_active_subscription(
         result = await session.execute(
             select(Subscription).where(
                 Subscription.user_id == user_id,
-                Subscription.is_active == True,
+                Subscription.is_active.is_(True),
             )
         )
         existing = result.scalar_one()

@@ -6,14 +6,14 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import (
-    AsyncSession, 
-    async_sessionmaker, 
+    AsyncSession,
+    async_sessionmaker,
     create_async_engine,
 )
 from sqlalchemy.pool import NullPool
 
-from app.main import app
 from app.db.session import get_session
+from app.main import app
 from app.models.plan import Plan
 
 
@@ -36,8 +36,8 @@ async def session_fixture() -> AsyncIterator[AsyncSession]:
         cursor.close()
 
     # Import models before create_all so metadata contains tables
+    from app import models  # noqa: F401
     from app.db.base import Base
-    from app import models 
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

@@ -6,10 +6,7 @@ def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
         stream=sys.stdout,
-        format=(
-            "%(asctime)s | %(levelname)s | %(name)s | "
-            "%(message)s | %(extra)s"
-        ),
+        format=("%(asctime)s | %(levelname)s | %(name)s | %(message)s | %(extra)s"),
         force=True,
     )
 

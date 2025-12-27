@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
-from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
@@ -90,4 +90,3 @@ def get_current_subject(
         expected_type="access",
     )
     return str(payload["sub"])
-

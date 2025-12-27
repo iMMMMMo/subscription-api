@@ -33,13 +33,15 @@ async def _create_test_db_sessionmaker():
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
 
+    from app import models  # noqa: F401
     from app.db.base import Base
-    from app import models
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    SessionLocal = async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
     return engine, db_path, SessionLocal
 
 
@@ -77,7 +79,7 @@ async def test_ensure_active_subscription_is_safe_under_concurrency():
             result = await verify.execute(
                 select(Subscription).where(
                     Subscription.user_id == user_id,
-                    Subscription.is_active == True,
+                    Subscription.is_active.is_(True),
                 )
             )
             active_subs = list(result.scalars())

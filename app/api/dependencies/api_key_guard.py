@@ -1,4 +1,6 @@
-from fastapi import Header, HTTPException, status, Depends
+import logging
+
+from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,10 +10,7 @@ from app.models.plan import Plan
 from app.services.subscription_service import get_active_plan_for_user
 from app.services.usage_service import increment_usage
 
-import logging
-
-
-logger =  logging.getLogger("api.access")
+logger = logging.getLogger("api.access")
 
 
 async def _get_api_key(
@@ -23,13 +22,15 @@ async def _get_api_key(
         logger.warning(
             "api_key_missing",
             extra={"path": "api_key_guard"},
-        )   
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key missing")
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="API key missing"
+        )
 
     result = await session.execute(
         select(APIKey).where(
             APIKey.key == raw_key,
-            APIKey.is_active == True,
+            APIKey.is_active.is_(True),
         )
     )
     api_key = result.scalar_one_or_none()
@@ -42,7 +43,9 @@ async def _get_api_key(
                 "path": "api_key_guard",
             },
         )
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key"
+        )
 
     return api_key
 

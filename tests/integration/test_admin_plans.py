@@ -113,7 +113,9 @@ async def test_admin_can_update_plan(client: AsyncClient, session: AsyncSession)
     tokens = await _register_and_login_admin(client, session)
     token = tokens["access_token"]
 
-    create = await _create_plan(client, access_token=token, name="PRO", request_limit=10)
+    create = await _create_plan(
+        client, access_token=token, name="PRO", request_limit=10
+    )
     assert create.status_code == 201
     plan_id = create.json()["id"]
 

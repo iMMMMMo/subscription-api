@@ -1,20 +1,20 @@
-from datetime import date
 import asyncio
 import os
 import tempfile
+from datetime import date
 
 import pytest
 from sqlalchemy import event, select
 from sqlalchemy.ext.asyncio import (
-    AsyncSession, 
-    async_sessionmaker, 
+    AsyncSession,
+    async_sessionmaker,
     create_async_engine,
 )
 from sqlalchemy.pool import NullPool
 
 from app.models.api_key import APIKey
-from app.models.user import User
 from app.models.usage import Usage
+from app.models.user import User
 from app.services import usage_service
 
 
@@ -34,22 +34,22 @@ async def _create_test_db_sessionmaker():
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
 
+    from app import models  # noqa: F401
     from app.db.base import Base
-    from app import models
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
     SessionLocal = async_sessionmaker(
-        engine, 
-        class_=AsyncSession, 
-        expire_on_commit=False
+        engine, class_=AsyncSession, expire_on_commit=False
     )
     return engine, db_path, SessionLocal
 
 
 @pytest.mark.asyncio
-async def test_increment_usage_is_atomic_under_concurrency(monkeypatch: pytest.MonkeyPatch):
+async def test_increment_usage_is_atomic_under_concurrency(
+    monkeypatch: pytest.MonkeyPatch,
+):
     today = date.today()
     monkeypatch.setattr(usage_service, "utc_today", lambda: today)
 
