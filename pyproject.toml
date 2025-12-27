@@ -28,3 +28,19 @@ dependencies = [
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.14.10,<0.15.0)"
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+# E = pycodestyle errors, F = pyflakes, I = isort(import order)
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+# "black-like" by default
