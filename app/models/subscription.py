@@ -30,6 +30,7 @@ class Subscription(Base):
         Index(
             "ix_subscriptions_user_active",
             "user_id",
+            unique=True,
             postgresql_where=text("is_active = true"),
         ),
     )
