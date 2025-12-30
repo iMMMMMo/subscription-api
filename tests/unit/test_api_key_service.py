@@ -80,15 +80,16 @@ async def test_revoke_api_key_sets_inactive_and_commits_when_found():
     result.scalar_one_or_none.return_value = key
     session.execute.return_value = result
 
-    await revoke_api_key(session, key_id=55, user_id=9)
+    revoked = await revoke_api_key(session, key_id=55, user_id=9)
 
+    assert revoked is key
     assert key.is_active is False
     session.execute.assert_awaited_once()
     session.commit.assert_awaited_once()
 
 
 @pytest.mark.asyncio
-async def test_revoke_api_key_noops_when_not_found():
+async def test_revoke_api_key_returns_none_when_not_found():
     session = MagicMock()
     session.execute = AsyncMock()
     session.commit = AsyncMock()
@@ -97,7 +98,8 @@ async def test_revoke_api_key_noops_when_not_found():
     result.scalar_one_or_none.return_value = None
     session.execute.return_value = result
 
-    await revoke_api_key(session, key_id=999, user_id=9)
+    revoked = await revoke_api_key(session, key_id=999, user_id=9)
 
+    assert revoked is None
     session.execute.assert_awaited_once()
     session.commit.assert_not_awaited()

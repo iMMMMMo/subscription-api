@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import get_current_subject
@@ -42,8 +42,13 @@ async def revoke_key(
     subject: str = Depends(get_current_subject),
     session: AsyncSession = Depends(get_session),
 ):
-    await revoke_api_key(
+    api_key = await revoke_api_key(
         session,
         key_id=key_id,
         user_id=int(subject),
     )
+    if not api_key:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="API key not found",
+        )

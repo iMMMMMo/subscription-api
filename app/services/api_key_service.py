@@ -41,16 +41,18 @@ async def revoke_api_key(
     *,
     key_id: int,
     user_id: int,
-) -> None:
+) -> APIKey | None:
     result = await session.execute(
         select(APIKey).where(
             APIKey.id == key_id,
             APIKey.user_id == user_id,
+            APIKey.is_active.is_(True),
         )
     )
     api_key = result.scalar_one_or_none()
     if not api_key:
-        return
+        return None
 
     api_key.is_active = False
     await session.commit()
+    return api_key
