@@ -53,3 +53,20 @@ async def increment_usage(
         )
     )
     return int(current.scalar_one())
+
+
+async def get_usage(
+    session: AsyncSession,
+    *,
+    api_key_id: int,
+) -> int:
+    today = utc_today()
+
+    result = await session.execute(
+        select(Usage.request_count).where(
+            Usage.api_key_id == api_key_id,
+            Usage.day == today,
+        )
+    )
+    count = result.scalar_one_or_none()
+    return int(count or 0)

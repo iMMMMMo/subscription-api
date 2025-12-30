@@ -60,6 +60,7 @@ async def test_api_access_with_valid_key_within_limit(client: AsyncClient):
     resp = await _get_data(client, api_key=api_key)
     assert resp.status_code == 200
     assert resp.json()["message"] == "ok"
+    assert resp.json()["usage"] == 1
 
 
 @pytest.mark.asyncio
@@ -69,9 +70,11 @@ async def test_api_access_exceeding_limit_returns_429(client: AsyncClient):
 
     resp1 = await _get_data(client, api_key=api_key)
     assert resp1.status_code == 200
+    assert resp1.json()["usage"] == 1
 
     resp2 = await _get_data(client, api_key=api_key)
     assert resp2.status_code == 200
+    assert resp2.json()["usage"] == 2
 
     resp3 = await _get_data(client, api_key=api_key)
     assert resp3.status_code == 429
