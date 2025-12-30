@@ -28,6 +28,11 @@ This API has two separate ways to authenticate:
 - **JWT (Bearer token)** for user actions (login, creating/revoking API keys, admin endpoints)
 - **API key (`X-API-Key`)** for calling protected API endpoints
 
+Token lifetimes (current defaults):
+
+- Access token: 15 minutes
+- Refresh token: 7 days
+
 API keys are managed using JWT, but they are used separately for API access.
 
 ### Access Control Flow
@@ -63,6 +68,7 @@ It is created automatically when the user generates their **first API key** (tha
 
 - A partial unique index (PostgreSQL) enforces one active subscription per user.
 - Concurrency edge cases are handled in `ensure_active_subscription()` and `increment_usage()`.
+- Daily usage windows are UTC-based (the "day" boundary comes from `app.core.time.utc_today`).
 - Old usage rows are cleaned up by a background task started in the app `lifespan`.
 
 ## Project Architecture
