@@ -176,6 +176,36 @@ poetry run uvicorn app.main:app --reload
 - Swagger UI: `http://localhost:8000/docs`
 - Healthcheck: `http://localhost:8000/health`
 
+## Creating an admin (superuser)
+
+Admin endpoints (plan CRUD) require a user with `is_superuser=true`.
+
+Instead of exposing a REST endpoint to create admins, this project provides an **idempotent** script that can be run after migrations.
+
+Local:
+
+```bash
+poetry run python -m app.scripts.create_superuser \
+  --email admin@example.com \
+  --password pass123 \
+  --full-name "Admin"
+```
+
+Docker Compose:
+
+```bash
+docker compose exec api poetry run python -m app.scripts.create_superuser \
+  --email admin@example.com \
+  --password pass123
+```
+
+Notes:
+
+- Safe to re-run: if the user exists, it promotes them to superuser.
+- For an existing user, the script will not overwrite the password unless you pass `--update-password`.
+- Safety guard: the script refuses to run when `APP_ENV` is `prod`, `production` or `staging` unless you pass `--allow-prod`.
+- The script also supports env vars: `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_FULL_NAME`.
+
 ## Configuration (environment variables)
 
 Environment variables are loaded via `pydantic-settings`.
