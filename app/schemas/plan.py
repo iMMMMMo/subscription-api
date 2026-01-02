@@ -19,3 +19,10 @@ class PlanRead(BaseModel):
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PlanPublicRead(BaseModel):
+    name: str
+    request_limit: int
+
+    model_config = ConfigDict(from_attributes=True)

@@ -6,8 +6,10 @@ from app.db.session import get_session
 from app.schemas.plan import PlanCreate, PlanRead, PlanUpdate
 from app.services.plan_service import (
     create_plan,
-    list_plans,
     update_plan,
+)
+from app.services.plan_service import (
+    list_admin_plans as list_plans,
 )
 
 router = APIRouter(prefix="/admin/plans", tags=["admin"])

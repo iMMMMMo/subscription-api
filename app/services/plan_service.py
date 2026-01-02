@@ -22,10 +22,20 @@ async def create_plan(
     return plan
 
 
-async def list_plans(
+async def list_public_plans(session: AsyncSession) -> list[Plan]:
+    stmt = (
+        select(Plan)
+        .where(Plan.is_active.is_(True))
+        .order_by(Plan.request_limit, Plan.name, Plan.id)
+    )
+    result = await session.execute(stmt)
+    return list(result.scalars())
+
+
+async def list_admin_plans(
     session: AsyncSession,
     *,
-    include_inactive: bool = False,
+    include_inactive: bool = True,
 ) -> list[Plan]:
     stmt = select(Plan)
     if not include_inactive:
