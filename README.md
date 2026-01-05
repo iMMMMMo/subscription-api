@@ -12,6 +12,7 @@ This project is designed to demonstrate backend engineering practices, focusing 
 - JWT authentication (access + refresh tokens) for user actions
 - API key (`X-API-Key`) authentication for protected endpoints
 - Subscription plans with per-day request limits
+- Plan listing (public) and subscription switching (upgrades/downgrades)
 - Lazy subscription creation on first API key
 - Per-day usage tracking with atomic increments + limit enforcement
 - Admin (superuser) endpoints for managing plans
@@ -128,6 +129,7 @@ Tests are asynchronous (`pytest-asyncio`) and use `httpx.AsyncClient`.
   - Auth (register / login / refresh / me)
   - API key creation (revocation is covered in unit tests)
   - Request limits
+  - Subscription switching (upgrade/downgrade)
   - Admin-only plan management
 
 - Additional correctness checks under concurrency:
@@ -258,6 +260,14 @@ Base prefix: `/api/v1`
 
 - `GET /data`
 
+### Plans (`/plans`, public)
+
+- `GET /plans`
+
+### Subscriptions (`/subscriptions`, Bearer)
+
+- `POST /subscriptions/switch`
+
 ### Admin (`/admin/plans`, Bearer + is_superuser)
 
 - `POST /admin/plans`
@@ -306,6 +316,17 @@ curl http://localhost:8000/api/v1/data \
   -H "X-API-Key: <API_KEY>"
 ```
 
+### Switch subscription plan
+
+Assumes the target plan exists and is active (e.g. created via admin endpoints).
+
+```bash
+curl -X POST http://localhost:8000/api/v1/subscriptions/switch \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"plan_name":"PRO"}'
+```
+
 ## Migrations
 
 - Migrations live in `alembic/versions/` and can be applied with `alembic upgrade head`.
@@ -324,12 +345,6 @@ poetry run ruff format .
 ```bash
 poetry run pytest
 ```
-
-## Possible extensions (next steps)
-
-- Endpoints for plan upgrades/downgrades (switching subscriptions)
-- Payment integration (e.g. Stripe) and billing periods
-- Rate limiting at gateway/proxy level + caching
 
 ## What I learned
 
