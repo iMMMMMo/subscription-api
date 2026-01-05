@@ -9,6 +9,7 @@ from app.api.v1 import (
     auth_router,
     data_router,
     plans_router,
+    subscriptions_router,
 )
 from app.core.logging import setup_logging
 from app.tasks.usage_cleanup import start_usage_cleanup_loop
@@ -37,6 +38,7 @@ app.include_router(auth_router, prefix="/api/v1")
 app.include_router(api_keys_router, prefix="/api/v1")
 app.include_router(data_router, prefix="/api/v1")
 app.include_router(plans_router, prefix="/api/v1")
+app.include_router(subscriptions_router, prefix="/api/v1")
 app.include_router(admin_plans_router, prefix="/api/v1")
 
 
